@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #121212;
+  --color-icon: #2e3a59;
+  --color-hairline: rgba(0, 0, 0, 0.1);
+
+  --color-swatch-red: #e25f5f;
+  --color-swatch-lime: #b8e25f;
+  --color-swatch-navy: #233c6b;
+  --color-swatch-sky: #5fabe2;
+  --color-swatch-purple: #b54ef4;
+  --color-swatch-pink: #f44e8a;
+  --color-swatch-yellow: #f4cf4e;
+  --color-swatch-green: #44936d;
+}
+
+html {
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  /* We will set font-family in layout.tsx via next/font */
+  font-optical-sizing: auto;
+  font-feature-settings:
+    'cv02' 1,
+    'cv03' 1,
+    'cv04' 1,
+    'cv11' 1,
+    'calt' 1;
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Prices, quantities and counts should never jitter as digits change. */
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings:
+    'tnum' 1,
+    'cv02' 1,
+    'cv03' 1,
+    'cv04' 1;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
