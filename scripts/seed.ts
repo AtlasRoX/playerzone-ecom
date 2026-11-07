@@ -1,38 +1,47 @@
-import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
+/**
+ * Seeds the product catalogue by calling the app's `/api/seed` route.
+ *
+ * The route has to run inside Next: product images are bundler-resolved to
+ * build-hashed URLs (`/_next/static/media/<name>.<hash>.png`), which cannot be
+ * derived in a plain Node process. Re-implementing the inserts here would
+ * store paths the storefront cannot load.
+ *
+ * Usage:
+ *   pnpm dev          # in one terminal
+ *   pnpm seed         # in another
+ */
 import * as dotenv from 'dotenv';
-import * as schema from '../src/lib/db/schema';
-import { PRODUCTS } from '../src/lib/products';
-import { slugify } from '../src/lib/slug';
 
 dotenv.config({ path: '.env.local' });
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL is missing in .env.local');
-}
-
-const sql = neon(process.env.DATABASE_URL);
-const db = drizzle(sql, { schema });
+const BASE_URL = process.env.SEED_BASE_URL ?? 'http://localhost:3000';
 
 async function main() {
-  console.log('Seeding products...');
+  const url = `${BASE_URL}/api/seed`;
 
-  for (const product of PRODUCTS) {
-    await db.insert(schema.products).values({
-      name: product.name,
-      slug: slugify(product.name + ' ' + product.id),
-      price: product.price.toString(),
-      image: product.image,
-      isNew: product.isNew,
-      inStock: product.inStock,
-      trending: product.trending || false,
-    });
+  console.log(`Seeding products via ${url}...`);
+
+  let response: Response;
+  try {
+    response = await fetch(url);
+  } catch (error) {
+    throw new Error(
+      `Could not reach ${url}. Is the dev server running? Start it with \`pnpm dev\`.\n${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
   }
 
-  console.log('Seeding completed!');
+  const body = await response.text();
+
+  if (!response.ok) {
+    throw new Error(`Seeding failed (HTTP ${response.status}): ${body}`);
+  }
+
+  console.log('Seeding completed successfully!');
 }
 
 main().catch((err) => {
-  console.error('Error seeding database:', err);
+  console.error('Error seeding database:', err instanceof Error ? err.message : err);
   process.exit(1);
 });

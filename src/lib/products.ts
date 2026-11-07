@@ -102,6 +102,10 @@ export type Product = {
   reviews: number
   /** Extra angles shown in the detail-page gallery, first entry is `image`. */
   gallery?: string[]
+  /** Catalogue flags. Stored on the row and set from the admin product form. */
+  isNew?: boolean
+  inStock?: boolean
+  trending?: boolean
 }
 
 
